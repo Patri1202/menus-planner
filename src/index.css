@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+/* src/index.css
+Vite viene de fábrica con estilos CSS de prueba (centrados de texto, botones con bordes negros, etc.) que entran en conflicto con nuestro diseño.
+
+Por qué borramos todo: Para dejar la hoja de estilos a cero y no arrastrar márgenes raros.
+
+Por qué dejamos solo @import "tailwindcss";: Esta única instrucción le dice al navegador y al compilador: "Trae aquí todo el catálogo de utilidades y reseteos básicos de Tailwind".
+ */
