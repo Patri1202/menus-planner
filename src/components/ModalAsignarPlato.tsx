@@ -1,6 +1,6 @@
 // src/components/ModalAsignarPlato.tsx
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { Plato, TipoComida, TupperPreparado, Receta } from '../types/menuPlan';
 
 export interface ModalAsignarPlatoProps {
@@ -28,21 +28,17 @@ export const ModalAsignarPlato = ({
   alCerrar,
   alGuardar,
 }: ModalAsignarPlatoProps) => {
-  const [nombre, setNombre] = useState('');
-  const [esBatchCooking, setEsBatchCooking] = useState(false);
+  const [prevPlato, setPrevPlato] = useState(platoActual);
+  const [nombre, setNombre] = useState(platoActual ? platoActual.nombre : '');
+  const [esBatchCooking, setEsBatchCooking] = useState(Boolean(platoActual?.esBatchCooking));
   const [tupperSeleccionadoId, setTupperSeleccionadoId] = useState<string | undefined>(undefined);
 
-  useEffect(() => {
-    if (platoActual) {
-      setNombre(platoActual.nombre);
-      setEsBatchCooking(Boolean(platoActual.esBatchCooking));
-      setTupperSeleccionadoId(undefined);
-    } else {
-      setNombre('');
-      setEsBatchCooking(false);
-      setTupperSeleccionadoId(undefined);
-    }
-  }, [platoActual, estaAbierto]);
+  if (platoActual !== prevPlato) {
+    setPrevPlato(platoActual);
+    setNombre(platoActual ? platoActual.nombre : '');
+    setEsBatchCooking(Boolean(platoActual?.esBatchCooking));
+    setTupperSeleccionadoId(undefined);
+  }
 
   if (!estaAbierto) {
     return null;
@@ -90,8 +86,8 @@ export const ModalAsignarPlato = ({
         {/* Cabecera del modal */}
         <div className="p-5 border-b border-slate-100 flex items-center justify-between">
           <div>
-            <h2 className="text-lg font-bold text-slate-800 capitalize">
-              {momentoSeleccionado}
+            <h2 className="text-lg font-bold text-slate-800">
+              {momentoSeleccionado === 'almuerzo' ? 'Comida' : 'Cena'}
             </h2>
             <p className="text-xs text-slate-400 mt-0.5 font-medium">
               Fecha: {fechaSeleccionada}
@@ -114,7 +110,7 @@ export const ModalAsignarPlato = ({
           {tuppersConStock.length > 0 && (
             <div>
               <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">
-                Usar tupper de la nevera:
+                Usar tupper del congelador:
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {tuppersConStock.map((tupper) => (
@@ -128,7 +124,7 @@ export const ModalAsignarPlato = ({
                         : 'bg-emerald-50/60 border-emerald-200 text-emerald-800 hover:bg-emerald-100/70'
                     }`}
                   >
-                    <span>🍱 {tupper.nombre}</span>
+                    <span>🧊 {tupper.nombre}</span>
                     <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
                       tupperSeleccionadoId === tupper.id
                         ? 'bg-emerald-700 text-emerald-100'
@@ -202,7 +198,7 @@ export const ModalAsignarPlato = ({
               className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300"
             />
             <span className="text-sm font-medium text-slate-700">
-              Es un tupper preparado (Batch Cooking) 🍱
+              Es un tupper preparado (Congelador) 🧊
             </span>
           </label>
 

@@ -21,8 +21,11 @@ import {
 import { CabeceraSemanal } from './components/CabeceraSemanal';
 import { ColumnaDia } from './components/ColumnaDia';
 import { ModalAsignarPlato } from './components/ModalAsignarPlato';
-import { PanelBatchCooking } from './components/PanelBatchCooking';
+import { ModalCongelador } from './components/ModalCongelador';
 import { ListaCompraModal } from './components/ListaCompraModal';
+
+// Referencia fija al documento del hogar en Firestore
+const docHogarRef = doc(db, 'hogares', 'mi_casa');
 
 export default function App() {
   // ---------------------------------------------------------------------------
@@ -84,7 +87,6 @@ export default function App() {
   // ---------------------------------------------------------------------------
   // 3. Sincronización en Tiempo Real con Firebase Firestore
   // ---------------------------------------------------------------------------
-  const docHogarRef = doc(db, 'hogares', 'mi_casa');
 
   useEffect(() => {
     // Escucha en tiempo real: cualquier cambio en la nube se refleja de inmediato
@@ -116,15 +118,17 @@ export default function App() {
   };
 
   // ---------------------------------------------------------------------------
-  // 4. Lógica de Tuppers / Batch Cooking
+  // 4. Lógica de Tuppers / Congelador
   // ---------------------------------------------------------------------------
+  const [modalCongeladorAbierto, setModalCongeladorAbierto] = useState(false);
+
   const manejarCrearTupper = (datos: { nombre: string; raciones: number }) => {
     const nuevoTupper: TupperPreparado = {
       id: `tupper_${Date.now()}`,
       nombre: datos.nombre,
       racionesDisponibles: datos.raciones,
       fechaCocinado: new Date().toISOString().split('T')[0],
-      lugarAlmacenaje: 'nevera',
+      lugarAlmacenaje: 'congelador',
     };
     const listaActualizada = [nuevoTupper, ...tuppers];
     setTuppers(listaActualizada);
@@ -298,11 +302,13 @@ export default function App() {
         <CabeceraSemanal
           tituloRango={textoRangoSemana}
           totalPendientesCompra={totalPendientesCompra}
+          totalTuppersCongelador={tuppers.reduce((acc, t) => acc + (t.racionesDisponibles || 0), 0)}
           alSemanaAnterior={manejarRetrocederSemana}
           alSemanaSiguiente={manejarAvanzarSemana}
           alVolverHoy={manejarVolverAHoy}
           alAbrirListaCompra={() => setModalCompraAbierto(true)}
           alAbrirRecetas={() => setModalRecetasAbierto(true)}
+          alAbrirCongelador={() => setModalCongeladorAbierto(true)}
         />
 
         {/* Cuadrícula semanal (7 columnas) */}
@@ -324,12 +330,7 @@ export default function App() {
           })}
         </main>
 
-        {/* Panel de Tuppers / Batch Cooking */}
-        <PanelBatchCooking
-          tuppers={tuppers}
-          alCrearTupper={manejarCrearTupper}
-          alEliminarTupper={manejarEliminarTupper}
-        />
+
 
         {/* Modal de asignación de plato */}
         {seleccionActual && (
@@ -366,6 +367,15 @@ export default function App() {
           alGuardarReceta={manejarGuardarReceta}
           alEliminarReceta={manejarEliminarReceta}
           alExportarACompra={manejarExportarACompra}
+        />
+
+        {/* Modal del Congelador */}
+        <ModalCongelador
+          estaAbierto={modalCongeladorAbierto}
+          tuppers={tuppers}
+          alCerrar={() => setModalCongeladorAbierto(false)}
+          alCrearTupper={manejarCrearTupper}
+          alEliminarTupper={manejarEliminarTupper}
         />
 
       </div>

@@ -49,16 +49,16 @@ export const ColumnaDia = ({
           : "bg-slate-50/70 border-slate-200/80 hover:border-slate-300"
       }`}
     >
-      {/* Cabecera del día (Nombre y Número) */}
+      {/* Cabecera del día (Nombre y Número en la misma línea) */}
       <div className="flex items-center justify-between pb-2 border-b border-slate-200/60">
-        <div>
+        <div className="flex items-baseline gap-1.5 min-w-0">
           {/* Nombre del día (ej: Lunes) */}
-          <span className="block text-xs font-bold uppercase tracking-wider text-slate-500">
+          <span className="text-xs font-bold uppercase tracking-wider text-slate-500 truncate">
             {dia.nombreDia}
           </span>
           {/* Número del día (ej: 2) */}
           <span
-            className={`text-lg font-black leading-none ${
+            className={`text-base font-black leading-none ${
               dia.esHoy ? "text-emerald-700" : "text-slate-800"
             }`}
           >
@@ -68,7 +68,7 @@ export const ColumnaDia = ({
 
         {/* Pequeña insignia visible únicamente si es la fecha de hoy */}
         {dia.esHoy && (
-          <span className="text-[10px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded-full uppercase tracking-wider">
+          <span className="text-[10px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">
             Hoy
           </span>
         )}
