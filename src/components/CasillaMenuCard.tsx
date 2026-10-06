@@ -58,14 +58,14 @@ export const CasillaMenuCard = ({
           <span className="text-xs font-medium">Añadir plato</span>
         </button>
       ) : (
-        // Caso B: Si SÍ hay un plato asignado, mostramos la tarjeta compacta con los datos
+        // Caso B: Si SÍ hay un plato asignado, mostramos la tarjeta con los datos y soporte multilínea
         <div
           onClick={alPulsarCasilla}
-          className="h-[64px] w-full bg-white border border-slate-200 hover:border-slate-300 rounded-xl px-2.5 py-1.5 shadow-xs hover:shadow-sm transition-all flex flex-col justify-between text-left cursor-pointer relative group"
+          className="min-h-[64px] h-auto w-full bg-white border border-slate-200 hover:border-slate-300 rounded-xl px-2.5 py-2 shadow-xs hover:shadow-sm transition-all flex flex-col justify-between gap-1.5 text-left cursor-pointer relative group"
         >
-          {/* Zona superior: Nombre del plato y botón de eliminar */}
-          <div className="flex items-start justify-between gap-1">
-            <p className="text-xs font-bold text-slate-800 line-clamp-2 leading-tight">
+          {/* Zona superior: Nombre del plato (con soporte para 1º y 2º plato en varias líneas) y botón de eliminar */}
+          <div className="flex items-start justify-between gap-1.5 w-full">
+            <p className="text-xs font-bold text-slate-800 whitespace-pre-line leading-snug break-words flex-1">
               {plato.nombre}
             </p>
 
@@ -78,7 +78,7 @@ export const CasillaMenuCard = ({
                   evento.stopPropagation();
                   alEliminarPlato();
                 }}
-                className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 p-0.5 rounded transition-all cursor-pointer shrink-0"
+                className="opacity-0 group-hover:opacity-100 max-sm:opacity-70 hover:!opacity-100 text-slate-400 hover:text-rose-500 p-0.5 rounded transition-all cursor-pointer shrink-0 mt-0.5"
                 title="Quitar plato"
               >
                 ✕
@@ -88,7 +88,7 @@ export const CasillaMenuCard = ({
 
           {/* Zona inferior: Etiqueta si es comida preparada (Batch Cooking / Congelador) */}
           {plato.esBatchCooking && (
-            <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded-md self-start">
+            <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-md self-start">
               🧊 Tupper
             </span>
           )}

@@ -169,24 +169,38 @@ export const ModalAsignarPlato = ({
           )}
           {/* Campo de texto de la comida */}
           <div>
-            <label
-              htmlFor="nombre-plato"
-              className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5"
-            >
-              Nombre de la comida o receta
-            </label>
-            <input
+            <div className="flex items-center justify-between mb-1.5">
+              <label
+                htmlFor="nombre-plato"
+                className="block text-xs font-bold uppercase tracking-wider text-slate-600"
+              >
+                Comida o platos del día
+              </label>
+              <span className="text-[11px] text-slate-400 font-medium">
+                Pulsa Intro para 2º plato
+              </span>
+            </div>
+            <textarea
               id="nombre-plato"
-              type="text"
+              rows={3}
               autoFocus
               value={nombre}
               onChange={(e) => {
                 setNombre(e.target.value);
                 setTupperSeleccionadoId(undefined);
               }}
-              placeholder="Ej: Lentejas estofadas con arroz"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none text-sm transition-all"
+              onKeyDown={(e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                  e.preventDefault();
+                  manejarEnvio(e);
+                }
+              }}
+              placeholder={"1º Ensalada mixta\n2º Salmón con patatas"}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none text-sm transition-all resize-y min-h-[76px] leading-relaxed"
             />
+            <p className="text-[11px] text-slate-400 mt-1">
+              💡 Puedes pulsar <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-[10px] font-mono text-slate-600">Intro</kbd> para añadir un segundo plato o acompañamiento en otra línea.
+            </p>
           </div>
 
           {/* Opción Batch Cooking */}
