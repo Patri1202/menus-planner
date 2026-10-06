@@ -103,6 +103,23 @@ export default function App() {
     return () => desuscribir();
   }, []);
 
+  // Función para eliminar campos undefined recursivamente (Firestore los rechaza y causa errores)
+  const eliminarCamposUndefined = <T,>(obj: T): T => {
+    if (obj === null || obj === undefined || typeof obj !== 'object') {
+      return obj;
+    }
+    if (Array.isArray(obj)) {
+      return obj.map(eliminarCamposUndefined) as unknown as T;
+    }
+    const limpio: Record<string, unknown> = {};
+    for (const [clave, valor] of Object.entries(obj)) {
+      if (valor !== undefined) {
+        limpio[clave] = eliminarCamposUndefined(valor);
+      }
+    }
+    return limpio as T;
+  };
+
   // Función auxiliar para guardar cambios parciales en Firestore
   const guardarEnFirestore = async (datosNuevos: {
     registroComidas?: Record<string, Plato>;
@@ -111,7 +128,8 @@ export default function App() {
     recetas?: Receta[];
   }) => {
     try {
-      await setDoc(docHogarRef, datosNuevos, { merge: true });
+      const datosLimpios = eliminarCamposUndefined(datosNuevos);
+      await setDoc(docHogarRef, datosLimpios, { merge: true });
     } catch (error) {
       console.error('Error al guardar en Firestore:', error);
     }

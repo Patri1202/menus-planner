@@ -86,6 +86,8 @@ export const RecetarioModal = ({
     setIngredientesTexto('');
     setPasosTexto('');
     setModoCreacion(false);
+    setBusqueda('');
+    setCategoriaFiltro('todas');
   };
 
   const manejarEnvio = (e: React.FormEvent) => {
@@ -103,15 +105,22 @@ export const RecetarioModal = ({
       .map((p) => p.trim())
       .filter((p) => p.length > 0);
 
-    alGuardarReceta({
+    const nuevaReceta: Omit<Receta, 'id'> = {
       nombre: nombre.trim(),
       categoria,
-      tiempoMinutos: typeof tiempoMinutos === 'number' ? tiempoMinutos : undefined,
-      urlOrigen: urlOrigen.trim() || undefined,
       ingredientes,
       pasos,
-    });
+    };
 
+    if (typeof tiempoMinutos === 'number' && !isNaN(tiempoMinutos)) {
+      nuevaReceta.tiempoMinutos = tiempoMinutos;
+    }
+
+    if (urlOrigen.trim()) {
+      nuevaReceta.urlOrigen = urlOrigen.trim();
+    }
+
+    alGuardarReceta(nuevaReceta);
     resetearFormulario();
   };
 
