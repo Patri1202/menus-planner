@@ -24,6 +24,8 @@ import { ModalAsignarPlato } from './components/ModalAsignarPlato';
 import { ModalCongelador } from './components/ModalCongelador';
 import { ListaCompraModal } from './components/ListaCompraModal';
 
+import { mostrarToastExito } from './utils/alertas';
+
 // Referencia fija al documento del hogar en Firestore
 const docHogarRef = doc(db, 'hogares', 'mi_casa');
 
@@ -227,7 +229,7 @@ export default function App() {
     const listaActualizada = [...nuevosItems, ...itemsCompra];
     setItemsCompra(listaActualizada);
     guardarEnFirestore({ itemsCompra: listaActualizada });
-    alert(`¡Se han añadido ${ingredientes.length} ingredientes a tu lista de compra!`);
+    mostrarToastExito(`¡Se han añadido ${ingredientes.length} ingredientes a tu lista de compra!`);
   };
 
   // ---------------------------------------------------------------------------

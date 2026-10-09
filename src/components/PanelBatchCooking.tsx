@@ -50,12 +50,9 @@ export const PanelBatchCooking = ({
   };
 
   return (
-    <section className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm mt-8">
+    <section className="bg-white border border-slate-200 rounded-lg p-5 shadow-xs mt-8">
       {/* Cabecera del panel */}
       <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
-        <span className="text-xl" role="img" aria-label="tupper">
-          🍱
-        </span>
         <div>
           <h2 className="text-lg font-bold text-slate-800">
             Nevera & Batch Cooking
@@ -76,7 +73,7 @@ export const PanelBatchCooking = ({
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
           placeholder="Ej: Boloñesa de lentejas"
-          className="flex-1 px-3.5 py-2 text-sm rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all"
+          className="flex-1 px-3.5 py-2 text-sm rounded-md border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
         />
 
         <div className="flex items-center gap-2">
@@ -86,7 +83,7 @@ export const PanelBatchCooking = ({
             max="20"
             value={raciones}
             onChange={(e) => setRaciones(Math.max(1, parseInt(e.target.value) || 1))}
-            className="w-20 px-3 py-2 text-sm text-center rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all"
+            className="w-20 px-3 py-2 text-sm text-center rounded-md border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all"
             title="Número de raciones preparadas"
           />
           <span className="text-xs font-semibold text-slate-500 hidden sm:inline">
@@ -96,7 +93,7 @@ export const PanelBatchCooking = ({
           <button
             type="submit"
             disabled={nombre.trim() === ''}
-            className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl transition-colors cursor-pointer shrink-0"
+            className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-md transition-colors cursor-pointer shrink-0"
           >
             + Guardar
           </button>
@@ -105,7 +102,7 @@ export const PanelBatchCooking = ({
 
       {/* Lista de tuppers en stock */}
       {tuppers.length === 0 ? (
-        <p className="text-xs text-slate-400 text-center py-4 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+        <p className="text-xs text-slate-400 text-center py-4 bg-slate-50 rounded-md border border-dashed border-slate-200">
           No tienes ningún tupper registrado en stock. ¡Añade uno arriba!
         </p>
       ) : (
@@ -113,13 +110,13 @@ export const PanelBatchCooking = ({
           {tuppers.map((tupper) => (
             <div
               key={tupper.id}
-              className="flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors"
+              className="flex items-center justify-between p-3 rounded-md border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors"
             >
               <div className="min-w-0 pr-2">
                 <p className="text-xs font-bold text-slate-800 truncate">
                   {tupper.nombre}
                 </p>
-                <span className="inline-block mt-1 text-[11px] font-semibold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-md">
+                <span className="inline-block mt-1 text-[11px] font-semibold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded">
                   {tupper.racionesDisponibles} {tupper.racionesDisponibles === 1 ? 'ración' : 'raciones'}
                 </span>
               </div>

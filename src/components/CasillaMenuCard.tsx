@@ -30,26 +30,24 @@ export const CasillaMenuCard = ({
   alPulsarCasilla,
   alEliminarPlato,
 }: CasillaMenuCardProps) => {
-  // Determinamos el título legible y el icono según sea comida o cena
+  // Determinamos el título legible según sea comida o cena
   const esAlmuerzo = tipoComida === "almuerzo";
   const etiquetaTitulo = esAlmuerzo ? "Comida" : "Cena";
-  const iconoMomento = esAlmuerzo ? "☀️" : "🌙";
 
   return (
     // Contenedor de la casilla con margen vertical pequeño
     <div className="flex flex-col gap-1 w-full">
-      {/* Cabecera minúscula del momento del día */}
-      <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-1">
-        <span>{iconoMomento}</span>
+      {/* Cabecera del momento del día en negrita */}
+      <div className="flex items-center text-[11px] font-bold text-slate-600 uppercase tracking-wider px-1">
         <span>{etiquetaTitulo}</span>
       </div>
 
-      {/* Caso A: Si NO hay plato asignado, mostramos el botón de añadir más compacto */}
+      {/* Caso A: Si NO hay plato asignado, mostramos el botón de añadir con esquinas rounded-md más marcadas */}
       {!plato ? (
         <button
           type="button"
           onClick={alPulsarCasilla}
-          className="h-[64px] w-full border-2 border-dashed border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/50 rounded-xl flex items-center justify-center gap-1.5 text-slate-400 hover:text-emerald-700 transition-all cursor-pointer group px-2"
+          className="h-[64px] w-full border-2 border-dashed border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/50 rounded-md flex items-center justify-center gap-1.5 text-slate-400 hover:text-emerald-700 transition-all cursor-pointer group px-2"
         >
           {/* Símbolo más que crece ligeramente al pasar el ratón */}
           <span className="text-lg font-light group-hover:scale-125 transition-transform">
@@ -58,10 +56,10 @@ export const CasillaMenuCard = ({
           <span className="text-xs font-medium">Añadir plato</span>
         </button>
       ) : (
-        // Caso B: Si SÍ hay un plato asignado, mostramos la tarjeta con los datos y soporte multilínea
+        // Caso B: Si SÍ hay un plato asignado, mostramos la tarjeta con esquinas rounded-md
         <div
           onClick={alPulsarCasilla}
-          className="min-h-[64px] h-auto w-full bg-white border border-slate-200 hover:border-slate-300 rounded-xl px-2.5 py-2 shadow-xs hover:shadow-sm transition-all flex flex-col justify-between gap-1.5 text-left cursor-pointer relative group"
+          className="min-h-[64px] h-auto w-full bg-white border border-slate-200 hover:border-slate-300 rounded-md px-2.5 py-2 shadow-2xs hover:shadow-xs transition-all flex flex-col justify-between gap-1.5 text-left cursor-pointer relative group"
         >
           {/* Zona superior: Nombre del plato (con soporte para 1º y 2º plato en varias líneas) y botón de eliminar */}
           <div className="flex items-start justify-between gap-1.5 w-full">
@@ -74,7 +72,7 @@ export const CasillaMenuCard = ({
               <button
                 type="button"
                 onClick={(evento) => {
-                  // Evita que el clic en la papelera active también el clic de la tarjeta completa
+                  // Evita que el clic en la papelera active también el clic de la tarjeta completa (burbujeo)
                   evento.stopPropagation();
                   alEliminarPlato();
                 }}
@@ -86,10 +84,10 @@ export const CasillaMenuCard = ({
             )}
           </div>
 
-          {/* Zona inferior: Etiqueta si es comida preparada (Batch Cooking / Congelador) */}
+          {/* Zona inferior: Etiqueta si es comida preparada (Batch Cooking / Congelador) limpia de emojis */}
           {plato.esBatchCooking && (
-            <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-md self-start">
-              🧊 Tupper
+            <span className="inline-flex items-center gap-1 text-[9px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded self-start">
+              Tupper preparado
             </span>
           )}
         </div>

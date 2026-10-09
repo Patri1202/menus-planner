@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import type { Receta, CategoriaReceta } from '../types/menuPlan';
+import { confirmarAccion } from '../utils/alertas';
 
 export interface RecetarioModalProps {
   estaAbierto: boolean;
@@ -13,13 +14,13 @@ export interface RecetarioModalProps {
 }
 
 const CATEGORIAS_ETIQUETAS: Record<CategoriaReceta, string> = {
-  legumbres: '🥗 Legumbres',
-  verduras: '🥦 Verduras',
-  pescado: '🐟 Pescado',
-  carne: '🥩 Carne',
-  pasta_arroz: '🍝 Pasta y Arroz',
-  postre_desayuno: '🥞 Desayunos y Dulces',
-  otro: '🍳 Otros',
+  legumbres: 'Legumbres',
+  verduras: 'Verduras',
+  pescado: 'Pescado',
+  carne: 'Carne',
+  pasta_arroz: 'Pasta y Arroz',
+  postre_desayuno: 'Desayunos y Dulces',
+  otro: 'Otros',
 };
 
 export const RecetarioModal = ({
@@ -129,20 +130,25 @@ export const RecetarioModal = ({
       {/* ========================================================================= */}
       {/* 1. MODAL PRINCIPAL: LISTADO DE RECETAS O FORMULARIO DE ALTA              */}
       {/* ========================================================================= */}
+      {/* ========================================================================= */}
+      {/* 1. MODAL PRINCIPAL: LISTADO DE RECETAS O FORMULARIO DE ALTA              */}
+      {/* ========================================================================= */}
       <div
         role="dialog"
         aria-modal="true"
         className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-xs"
         onClick={alCerrar}
       >
+        {/* Contenedor del Modal:
+            - rounded-lg: esquinas firmes y definidas (8px) en vez de rounded-3xl (24px)
+            - border border-slate-200: marco limpio tipo panel de control */}
         <div
-          className="bg-white w-full max-w-4xl h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-slate-100"
+          className="bg-white w-full max-w-4xl h-[90vh] rounded-lg shadow-2xl flex flex-col overflow-hidden border border-slate-200"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Cabecera general */}
           <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white">
             <div className="flex items-center gap-2.5">
-              <span className="text-2xl">📖</span>
               <div>
                 <h2 className="text-lg font-bold text-slate-800">Mi Recetario</h2>
                 <p className="text-xs text-slate-400 font-medium">
@@ -156,7 +162,7 @@ export const RecetarioModal = ({
                 <button
                   type="button"
                   onClick={() => setModoCreacion(true)}
-                  className="px-3.5 py-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs hover:shadow transition-all cursor-pointer flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-md shadow-2xs hover:shadow-xs transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <span>+</span>
                   <span>Nueva Receta</span>
@@ -165,7 +171,7 @@ export const RecetarioModal = ({
                 <button
                   type="button"
                   onClick={resetearFormulario}
-                  className="px-3.5 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+                  className="px-3.5 py-1.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
                 >
                   ← Volver al listado
                 </button>
@@ -174,7 +180,7 @@ export const RecetarioModal = ({
               <button
                 type="button"
                 onClick={alCerrar}
-                className="text-slate-400 hover:text-slate-700 p-2 rounded-full hover:bg-slate-100 text-sm transition-colors cursor-pointer"
+                className="text-slate-400 hover:text-slate-700 p-1.5 rounded hover:bg-slate-100 text-sm transition-colors cursor-pointer"
                 title="Cerrar ventana de recetas"
               >
                 ✕
@@ -185,7 +191,7 @@ export const RecetarioModal = ({
           {/* CUERPO DEL MODAL */}
           {modoCreacion ? (
             /* ========================================================================= */
-            /* A. Formulario de nueva receta                                             */
+            /* A. Formulario de nueva receta (inputs con esquinas rounded-md)            */
             /* ========================================================================= */
             <form onSubmit={manejarEnvio} className="flex-1 overflow-y-auto p-6 space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -200,7 +206,7 @@ export const RecetarioModal = ({
                     value={nombre}
                     onChange={(e) => setNombre(e.target.value)}
                     placeholder="Ej: Salmón al horno con patatas y eneldo"
-                    className="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                    className="w-full px-3.5 py-2 text-sm rounded-md border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
                   />
                 </div>
 
@@ -211,7 +217,7 @@ export const RecetarioModal = ({
                   <select
                     value={categoria}
                     onChange={(e) => setCategoria(e.target.value as CategoriaReceta)}
-                    className="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none bg-white"
+                    className="w-full px-3 py-2 text-sm rounded-md border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none bg-white cursor-pointer"
                   >
                     {Object.entries(CATEGORIAS_ETIQUETAS).map(([key, label]) => (
                       <option key={key} value={key}>
@@ -233,7 +239,7 @@ export const RecetarioModal = ({
                     value={tiempoMinutos}
                     onChange={(e) => setTiempoMinutos(e.target.value ? parseInt(e.target.value) : '')}
                     placeholder="Ej: 30"
-                    className="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                    className="w-full px-3.5 py-2 text-sm rounded-md border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
                   />
                 </div>
 
@@ -246,7 +252,7 @@ export const RecetarioModal = ({
                     value={urlOrigen}
                     onChange={(e) => setUrlOrigen(e.target.value)}
                     placeholder="https://instagram.com/reel/..."
-                    className="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none"
+                    className="w-full px-3.5 py-2 text-sm rounded-md border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
                   />
                 </div>
               </div>
@@ -265,7 +271,7 @@ export const RecetarioModal = ({
                     value={ingredientesTexto}
                     onChange={(e) => setIngredientesTexto(e.target.value)}
                     placeholder={'2 lomos de salmón\n3 patatas medianas\nEneldo fresco\nAceite de oliva y sal'}
-                    className="w-full p-3 text-sm rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none font-mono"
+                    className="w-full p-3 text-sm rounded-md border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none font-mono"
                   />
                 </div>
 
@@ -282,23 +288,23 @@ export const RecetarioModal = ({
                     value={pasosTexto}
                     onChange={(e) => setPasosTexto(e.target.value)}
                     placeholder={'Precalentar el horno a 200°C.\nCortar las patatas en rodajas finas y hornear 15 min.\nAñadir el salmón encima y hornear 12 min más.'}
-                    className="w-full p-3 text-sm rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none font-sans"
+                    className="w-full p-3 text-sm rounded-md border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none font-sans"
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+              <div className="flex justify-end gap-2.5 pt-4 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={resetearFormulario}
-                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-md cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={!nombre.trim()}
-                  className="px-5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded-xl shadow-xs cursor-pointer"
+                  className="px-5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded-md shadow-2xs cursor-pointer"
                 >
                   Guardar Receta
                 </button>
@@ -309,7 +315,7 @@ export const RecetarioModal = ({
             /* B. LISTADO COMPLETO DE RECETAS EN CATÁLOGO / CARDS                        */
             /* ========================================================================= */
             <div className="flex-1 flex flex-col overflow-hidden bg-slate-50/40">
-              {/* Barra de búsqueda y selector de categoría */}
+              {/* Barra de búsqueda y selector de categoría con esquinas rounded-md */}
               <div className="p-4 sm:px-6 sm:py-3.5 border-b border-slate-100 bg-white flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
                 <div className="relative flex-1">
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm">
@@ -320,13 +326,13 @@ export const RecetarioModal = ({
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
                     placeholder="Buscar receta por nombre o ingrediente..."
-                    className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none bg-slate-50/70"
+                    className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm rounded-md border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none bg-slate-50/70"
                   />
                   {busqueda && (
                     <button
                       type="button"
                       onClick={() => setBusqueda('')}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs p-1"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs p-1 rounded"
                     >
                       ✕
                     </button>
@@ -337,7 +343,7 @@ export const RecetarioModal = ({
                   <select
                     value={categoriaFiltro}
                     onChange={(e) => setCategoriaFiltro(e.target.value)}
-                    className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 text-slate-700 bg-white outline-none focus:border-emerald-500 cursor-pointer"
+                    className="w-full px-3 py-2 text-xs sm:text-sm rounded-md border border-slate-200 text-slate-700 bg-white outline-none focus:border-emerald-500 cursor-pointer"
                   >
                     <option value="todas">Todas las categorías</option>
                     {Object.entries(CATEGORIAS_ETIQUETAS).map(([key, label]) => (
@@ -362,7 +368,7 @@ export const RecetarioModal = ({
                     <button
                       type="button"
                       onClick={() => setModoCreacion(true)}
-                      className="mt-4 px-4 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-xs transition-colors cursor-pointer"
+                      className="mt-4 px-4 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-md shadow-2xs transition-colors cursor-pointer"
                     >
                       + Añadir mi primera receta
                     </button>
@@ -381,24 +387,26 @@ export const RecetarioModal = ({
                         setBusqueda('');
                         setCategoriaFiltro('todas');
                       }}
-                      className="mt-3 px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors cursor-pointer"
+                      className="mt-3 px-3 py-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-md transition-colors cursor-pointer"
                     >
                       Restablecer filtros
                     </button>
                   </div>
                 ) : (
-                  /* Grid con tarjetas de recetas */
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  /* Grid con tarjetas de recetas:
+                     - rounded-md: esquinas firmes (6px) para dar aspecto ordenado y compacto
+                     - border border-slate-200: marco limpio */
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
                     {recetasFiltradas.map((r) => (
                       <div
                         key={r.id}
                         onClick={() => setRecetaSeleccionadaId(r.id)}
-                        className="bg-white border border-slate-200/90 hover:border-emerald-400 rounded-2xl p-4 shadow-2xs hover:shadow-md transition-all cursor-pointer flex flex-col justify-between group relative"
+                        className="bg-white border border-slate-200 hover:border-emerald-500 rounded-md p-4 shadow-2xs hover:shadow-xs transition-all cursor-pointer flex flex-col justify-between group relative"
                       >
                         {/* Parte superior de la tarjeta */}
                         <div>
                           <div className="flex items-center justify-between gap-2 mb-2">
-                            <span className="inline-block text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-100/80 px-2 py-0.5 rounded-md">
+                            <span className="inline-block text-[11px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-100/80 px-2 py-0.5 rounded">
                               {CATEGORIAS_ETIQUETAS[r.categoria]}
                             </span>
 
@@ -411,13 +419,17 @@ export const RecetarioModal = ({
                               {/* Botón rápido de eliminar */}
                               <button
                                 type="button"
-                                onClick={(e) => {
+                                onClick={async (e) => {
                                   e.stopPropagation();
-                                  if (window.confirm(`¿Seguro que deseas eliminar la receta "${r.nombre}"?`)) {
+                                  const confirmado = await confirmarAccion(
+                                    '¿Eliminar receta?',
+                                    `¿Seguro que deseas eliminar la receta "${r.nombre}"?`
+                                  );
+                                  if (confirmado) {
                                     alEliminarReceta(r.id);
                                   }
                                 }}
-                                className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 p-1 rounded-md hover:bg-rose-50 transition-all cursor-pointer text-xs"
+                                className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-rose-500 p-1 rounded hover:bg-rose-50 transition-all cursor-pointer text-xs"
                                 title="Eliminar receta"
                               >
                                 🗑
@@ -462,8 +474,11 @@ export const RecetarioModal = ({
           className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-xs animate-fade-in"
           onClick={() => setRecetaSeleccionadaId(null)}
         >
+          {/* Contenedor del submodal:
+              - rounded-lg: esquinas firmes de 8px
+              - border border-slate-200: acabado sólido y estructurado */}
           <div
-            className="bg-white w-full max-w-2xl max-h-[90vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-slate-100"
+            className="bg-white w-full max-w-2xl max-h-[90vh] rounded-lg shadow-2xl flex flex-col overflow-hidden border border-slate-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Cabecera del sub-modal con botón para volver y la 'X' */}
@@ -471,7 +486,7 @@ export const RecetarioModal = ({
               <button
                 type="button"
                 onClick={() => setRecetaSeleccionadaId(null)}
-                className="flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-emerald-700 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-emerald-700 px-2.5 py-1.5 rounded-md hover:bg-slate-100 transition-colors cursor-pointer"
               >
                 <span>←</span>
                 <span>Volver al listado de recetas</span>
@@ -480,7 +495,7 @@ export const RecetarioModal = ({
               <button
                 type="button"
                 onClick={() => setRecetaSeleccionadaId(null)}
-                className="text-slate-400 hover:text-slate-700 p-2 rounded-full hover:bg-slate-100 text-sm font-bold transition-colors cursor-pointer"
+                className="text-slate-400 hover:text-slate-700 p-1.5 rounded hover:bg-slate-100 text-sm font-bold transition-colors cursor-pointer"
                 title="Cerrar receta y volver al listado"
               >
                 ✕
@@ -490,7 +505,7 @@ export const RecetarioModal = ({
             {/* Encabezado con título de la receta y acciones rápidas */}
             <div className="px-5 sm:px-6 pt-5 pb-4 border-b border-slate-100 bg-slate-50/40">
               <div className="flex flex-wrap items-center gap-2 mb-2">
-                <span className="inline-block text-xs font-bold text-emerald-800 bg-emerald-100/70 px-2.5 py-0.5 rounded-md">
+                <span className="inline-block text-xs font-bold text-emerald-800 bg-emerald-100/70 px-2.5 py-0.5 rounded">
                   {CATEGORIAS_ETIQUETAS[recetaDetalle.categoria]}
                 </span>
                 {recetaDetalle.tiempoMinutos && (
@@ -514,13 +529,13 @@ export const RecetarioModal = ({
                 {recetaDetalle.nombre}
               </h2>
 
-              {/* Botones de acción */}
+              {/* Botones de acción con esquinas rounded-md */}
               <div className="flex flex-wrap items-center gap-2.5 mt-3 pt-3 border-t border-slate-200/60">
                 {recetaDetalle.ingredientes.length > 0 && (
                   <button
                     type="button"
                     onClick={() => alExportarACompra(recetaDetalle.ingredientes)}
-                    className="text-xs font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200/80 px-3 py-1.5 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5"
+                    className="text-xs font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200/80 px-3 py-1.5 rounded-md transition-colors cursor-pointer flex items-center gap-1.5"
                   >
                     <span>🛒</span>
                     <span>Añadir ingredientes a la lista de compra</span>
@@ -529,13 +544,17 @@ export const RecetarioModal = ({
 
                 <button
                   type="button"
-                  onClick={() => {
-                    if (window.confirm(`¿Seguro que deseas eliminar la receta "${recetaDetalle.nombre}"?`)) {
+                  onClick={async () => {
+                    const confirmado = await confirmarAccion(
+                      '¿Eliminar receta?',
+                      `¿Seguro que deseas eliminar la receta "${recetaDetalle.nombre}"?`
+                    );
+                    if (confirmado) {
                       alEliminarReceta(recetaDetalle.id);
                       setRecetaSeleccionadaId(null);
                     }
                   }}
-                  className="text-xs font-semibold text-rose-500 hover:text-rose-700 hover:bg-rose-50 px-2.5 py-1.5 rounded-xl transition-colors cursor-pointer ml-auto"
+                  className="text-xs font-semibold text-rose-500 hover:text-rose-700 hover:bg-rose-50 px-2.5 py-1.5 rounded-md transition-colors cursor-pointer ml-auto"
                 >
                   Eliminar receta
                 </button>
@@ -545,7 +564,7 @@ export const RecetarioModal = ({
             {/* Cuerpo de la receta con scroll independiente para ver todo el texto claramente */}
             <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-6">
               {/* Sección Ingredientes */}
-              <div className="bg-emerald-50/40 border border-emerald-100/80 p-4 sm:p-5 rounded-2xl">
+              <div className="bg-emerald-50/40 border border-emerald-100/80 p-4 sm:p-5 rounded-md">
                 <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-900 mb-3 flex items-center gap-2">
                   <span>🥕</span>
                   <span>Ingredientes ({recetaDetalle.ingredientes.length})</span>
@@ -556,7 +575,7 @@ export const RecetarioModal = ({
                 ) : (
                   <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-slate-700">
                     {recetaDetalle.ingredientes.map((ingrediente, idx) => (
-                      <li key={idx} className="flex items-start gap-2 bg-white/70 px-2.5 py-1.5 rounded-lg border border-emerald-50">
+                      <li key={idx} className="flex items-start gap-2 bg-white/70 px-2.5 py-1.5 rounded border border-emerald-50">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0 mt-2" />
                         <span className="font-medium">{ingrediente}</span>
                       </li>
@@ -579,9 +598,9 @@ export const RecetarioModal = ({
                     {recetaDetalle.pasos.map((paso, idx) => (
                       <div
                         key={idx}
-                        className="flex gap-3 text-sm text-slate-700 leading-relaxed bg-slate-50/60 border border-slate-100 rounded-xl p-3.5"
+                        className="flex gap-3 text-sm text-slate-700 leading-relaxed bg-slate-50/60 border border-slate-100 rounded-md p-3.5"
                       >
-                        <span className="w-6 h-6 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
+                        <span className="w-6 h-6 rounded bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-2xs">
                           {idx + 1}
                         </span>
                         <p className="flex-1 whitespace-pre-line">{paso}</p>
@@ -597,7 +616,7 @@ export const RecetarioModal = ({
               <button
                 type="button"
                 onClick={() => setRecetaSeleccionadaId(null)}
-                className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 hover:bg-slate-200/60 rounded-xl transition-colors cursor-pointer"
+                className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-800 hover:bg-slate-200/60 rounded-md transition-colors cursor-pointer"
               >
                 Volver al listado de recetas
               </button>

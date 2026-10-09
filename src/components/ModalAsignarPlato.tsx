@@ -79,8 +79,11 @@ export const ModalAsignarPlato = ({
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in"
       onClick={alCerrar}
     >
+      {/* Contenedor del Modal:
+          - rounded-lg: esquinas firmes y marcadas (8px)
+          - border border-slate-200: marco nítido que define la ventana */}
       <div
-        className="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-100 overflow-hidden"
+        className="bg-white w-full max-w-md rounded-lg shadow-2xl border border-slate-200 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Cabecera del modal */}
@@ -96,7 +99,7 @@ export const ModalAsignarPlato = ({
           <button
             type="button"
             onClick={alCerrar}
-            className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+            className="text-slate-400 hover:text-slate-600 p-1.5 rounded hover:bg-slate-100 transition-colors cursor-pointer"
             title="Cerrar ventana"
           >
             ✕
@@ -118,14 +121,14 @@ export const ModalAsignarPlato = ({
                     key={tupper.id}
                     type="button"
                     onClick={() => manejarSeleccionarTupper(tupper)}
-                    className={`text-xs px-2.5 py-1.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 ${
+                    className={`text-xs px-2.5 py-1.5 rounded-md border transition-all cursor-pointer flex items-center gap-1.5 ${
                       tupperSeleccionadoId === tupper.id
-                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
                         : 'bg-emerald-50/60 border-emerald-200 text-emerald-800 hover:bg-emerald-100/70'
                     }`}
                   >
-                    <span>🧊 {tupper.nombre}</span>
-                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                    <span>{tupper.nombre}</span>
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded font-bold ${
                       tupperSeleccionadoId === tupper.id
                         ? 'bg-emerald-700 text-emerald-100'
                         : 'bg-emerald-200/80 text-emerald-900'
@@ -138,7 +141,7 @@ export const ModalAsignarPlato = ({
             </div>
           )}
 
-          {/* Desplegable limpio de recetas guardadas */}
+          {/* Desplegable limpio de recetas guardadas con esquinas rounded-md */}
           {recetasDisponibles.length > 0 && (
             <div>
               <label
@@ -156,12 +159,12 @@ export const ModalAsignarPlato = ({
                     manejarSeleccionarReceta(recetaEncontrada);
                   }
                 }}
-                className="w-full px-3 py-2 text-sm rounded-xl border border-slate-200 bg-white text-slate-700 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all cursor-pointer"
+                className="w-full px-3 py-2 text-sm rounded-md border border-slate-200 bg-white text-slate-700 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all cursor-pointer"
               >
                 <option value="">-- Selecciona una receta guardada --</option>
                 {recetasDisponibles.map((receta) => (
                   <option key={receta.id} value={receta.nombre}>
-                    📖 {receta.nombre}
+                    {receta.nombre}
                   </option>
                 ))}
               </select>
@@ -169,17 +172,12 @@ export const ModalAsignarPlato = ({
           )}
           {/* Campo de texto de la comida */}
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label
-                htmlFor="nombre-plato"
-                className="block text-xs font-bold uppercase tracking-wider text-slate-600"
-              >
-                Comida o platos del día
-              </label>
-              <span className="text-[11px] text-slate-400 font-medium">
-                Pulsa Intro para 2º plato
-              </span>
-            </div>
+            <label
+              htmlFor="nombre-plato"
+              className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5"
+            >
+              Comida o platos del día
+            </label>
             <textarea
               id="nombre-plato"
               rows={3}
@@ -196,15 +194,12 @@ export const ModalAsignarPlato = ({
                 }
               }}
               placeholder={"1º Ensalada mixta\n2º Salmón con patatas"}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none text-sm transition-all resize-y min-h-[76px] leading-relaxed"
+              className="w-full px-3.5 py-2.5 rounded-md border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-sm transition-all resize-y min-h-[76px] leading-relaxed"
             />
-            <p className="text-[11px] text-slate-400 mt-1">
-              💡 Puedes pulsar <kbd className="px-1.5 py-0.5 bg-slate-100 border border-slate-200 rounded text-[10px] font-mono text-slate-600">Intro</kbd> para añadir un segundo plato o acompañamiento en otra línea.
-            </p>
           </div>
 
-          {/* Opción Batch Cooking */}
-          <label className="flex items-center gap-2.5 p-3 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 cursor-pointer transition-colors">
+          {/* Opción Batch Cooking con esquinas rounded-md */}
+          <label className="flex items-center gap-2.5 p-3 rounded-md border border-slate-200 bg-slate-50/50 hover:bg-slate-50 cursor-pointer transition-colors">
             <input
               type="checkbox"
               checked={esBatchCooking}
@@ -212,23 +207,23 @@ export const ModalAsignarPlato = ({
               className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300"
             />
             <span className="text-sm font-medium text-slate-700">
-              Es un tupper preparado (Congelador) 🧊
+              Es un tupper preparado (Congelador)
             </span>
           </label>
 
-          {/* Botones de acción */}
+          {/* Botones de acción con esquinas rounded-md */}
           <div className="flex items-center justify-end gap-2.5 mt-2 pt-3 border-t border-slate-100">
             <button
               type="button"
               onClick={alCerrar}
-              className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+              className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-md transition-colors cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={nombre.trim() === ''}
-              className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-xl shadow-xs transition-colors cursor-pointer"
+              className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-md shadow-2xs transition-colors cursor-pointer"
             >
               Guardar plato
             </button>

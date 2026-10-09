@@ -57,8 +57,11 @@ export const ListaCompraModal = ({
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/50 backdrop-blur-xs"
       onClick={alCerrar}
     >
+      {/* Contenedor del Modal:
+          - sm:rounded-lg: esquinas firmes (8px) en lugar de rounded-2xl
+          - border border-slate-200: estructura sólida tipo bloc de notas */}
       <div
-        className="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-2xl shadow-xl flex flex-col max-h-[85vh] overflow-hidden"
+        className="bg-white w-full sm:max-w-md rounded-t-xl sm:rounded-lg shadow-xl flex flex-col max-h-[85vh] overflow-hidden border border-slate-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Cabecera limpia */}
@@ -74,7 +77,7 @@ export const ListaCompraModal = ({
           <button
             type="button"
             onClick={alCerrar}
-            className="text-slate-400 hover:text-slate-700 p-2 text-base rounded-full hover:bg-slate-50 transition-colors"
+            className="text-slate-400 hover:text-slate-700 p-1.5 text-base rounded hover:bg-slate-100 transition-colors cursor-pointer"
           >
             ✕
           </button>
@@ -93,7 +96,7 @@ export const ListaCompraModal = ({
           <button
             type="submit"
             disabled={!nuevoTexto.trim()}
-            className="text-xs font-bold text-emerald-600 disabled:opacity-30 disabled:cursor-not-allowed px-3 py-1.5 rounded-lg hover:bg-emerald-50 transition-all cursor-pointer"
+            className="text-xs font-bold text-emerald-600 disabled:opacity-30 disabled:cursor-not-allowed px-3 py-1.5 rounded-md hover:bg-emerald-50 transition-all cursor-pointer"
           >
             Añadir
           </button>
@@ -116,15 +119,15 @@ export const ListaCompraModal = ({
                   onClick={() => alAlternarComprado(item.id)}
                   className="flex items-center gap-3 text-left flex-1 cursor-pointer select-none"
                 >
-                  {/* Círculo interactivo tipo checklist */}
+                  {/* Casilla de verificación interactiva tipo checklist */}
                   <div
-                    className={`w-5 h-5 rounded-full border flex items-center justify-center transition-colors shrink-0 ${
+                    className={`w-5 h-5 rounded border flex items-center justify-center transition-colors shrink-0 ${
                       item.comprado
                         ? 'bg-emerald-500 border-emerald-500 text-white'
                         : 'border-slate-300 hover:border-emerald-500'
                     }`}
                   >
-                    {item.comprado && <span className="text-[11px] leading-none">✓</span>}
+                    {item.comprado && <span className="text-[11px] leading-none font-bold">✓</span>}
                   </div>
 
                   {/* Texto del producto */}
@@ -143,7 +146,7 @@ export const ListaCompraModal = ({
                 <button
                   type="button"
                   onClick={() => alEliminarItem(item.id)}
-                  className="text-slate-300 hover:text-rose-500 text-xs px-2 py-1 transition-colors cursor-pointer"
+                  className="text-slate-300 hover:text-rose-500 text-xs px-2 py-1 rounded transition-colors cursor-pointer"
                   title="Eliminar de la lista"
                 >
                   ✕
@@ -167,19 +170,19 @@ export const ListaCompraModal = ({
             <span />
           )}
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <button
               type="button"
               onClick={manejarCopiar}
               disabled={pendientes.length === 0}
-              className="text-xs font-semibold text-slate-600 hover:text-slate-900 disabled:opacity-40 transition-colors cursor-pointer"
+              className="text-xs font-semibold text-slate-600 hover:text-slate-900 disabled:opacity-40 transition-colors cursor-pointer px-2.5 py-1.5 rounded-md hover:bg-slate-200/60"
             >
               {copiado ? '✓ Copiado' : 'Copiar WhatsApp'}
             </button>
             <button
               type="button"
               onClick={alCerrar}
-              className="text-xs font-bold bg-slate-900 text-white px-3.5 py-1.5 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+              className="text-xs font-bold bg-slate-900 text-white px-3.5 py-1.5 rounded-md hover:bg-slate-800 transition-colors cursor-pointer"
             >
               Listo
             </button>

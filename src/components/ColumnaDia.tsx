@@ -41,11 +41,13 @@ export const ColumnaDia = ({
   alEliminarMomento,
 }: ColumnaDiaProps) => {
   return (
-    // Contenedor principal de la columna (un día de la semana)
+    // Contenedor principal de la columna (un día de la semana):
+    // - rounded-lg: esquinas firmes (8px) en lugar de rounded-2xl excesivamente redondeado
+    // - border border-slate-200/80: marco nítido para separar claramente cada día
     <div
-      className={`flex flex-col gap-3 p-3 rounded-2xl border transition-all ${
+      className={`flex flex-col gap-3 p-3 rounded-lg border transition-all ${
         dia.esHoy
-          ? "bg-emerald-50/40 border-emerald-300 ring-2 ring-emerald-400/20 shadow-xs"
+          ? "bg-emerald-50/40 border-emerald-300 ring-1 ring-emerald-400/30 shadow-xs"
           : "bg-slate-50/70 border-slate-200/80 hover:border-slate-300"
       }`}
     >
@@ -66,9 +68,9 @@ export const ColumnaDia = ({
           </span>
         </div>
 
-        {/* Pequeña insignia visible únicamente si es la fecha de hoy */}
+        {/* Pequeña insignia visible únicamente si es la fecha de hoy (rounded en vez de rounded-full) */}
         {dia.esHoy && (
-          <span className="text-[10px] font-bold bg-emerald-600 text-white px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0">
+          <span className="text-[10px] font-bold bg-emerald-600 text-white px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0">
             Hoy
           </span>
         )}
