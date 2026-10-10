@@ -1,6 +1,6 @@
 // src/App.tsx
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 // Conexión y utilidades de Firebase Firestore
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
@@ -23,13 +23,34 @@ import { ColumnaDia } from './components/ColumnaDia';
 import { ModalAsignarPlato } from './components/ModalAsignarPlato';
 import { ModalCongelador } from './components/ModalCongelador';
 import { ListaCompraModal } from './components/ListaCompraModal';
+import { LoginScreen } from './components/LoginScreen';
 
-import { mostrarToastExito } from './utils/alertas';
+import { mostrarToastExito, confirmarAccion } from './utils/alertas';
+import { AUTH_CONFIG } from './config/authConfig';
+import {
+  obtenerRegistroComidasDemo,
+  DEMO_TUPPERS,
+  DEMO_ITEMS_COMPRA,
+  DEMO_RECETAS,
+} from './data/demoData';
 
 // Referencia fija al documento del hogar en Firestore
 const docHogarRef = doc(db, 'hogares', 'mi_casa');
 
 export default function App() {
+  // ---------------------------------------------------------------------------
+  // 0. Modo de Acceso y Autenticación
+  // ---------------------------------------------------------------------------
+  const [modoAcceso, setModoAcceso] = useState<'personal' | 'demo' | null>(() => {
+    const modoGuardado =
+      localStorage.getItem(AUTH_CONFIG.STORAGE_KEYS.AUTH_MODE) ||
+      sessionStorage.getItem(AUTH_CONFIG.STORAGE_KEYS.AUTH_MODE);
+    if (modoGuardado === 'personal' || modoGuardado === 'demo') {
+      return modoGuardado;
+    }
+    return null;
+  });
+
   // ---------------------------------------------------------------------------
   // 1. Navegación y estado de fechas
   // ---------------------------------------------------------------------------
@@ -63,49 +84,56 @@ export default function App() {
   const [registroComidas, setRegistroComidas] = useState<Record<string, Plato>>({});
   const [tuppers, setTuppers] = useState<TupperPreparado[]>([]);
   const [itemsCompra, setItemsCompra] = useState<ItemCompra[]>([]);
-  const [recetas, setRecetas] = useState<Receta[]>([
-    {
-      id: 'rec_1',
-      nombre: 'Salmón al horno con patatas y eneldo',
-      categoria: 'pescado',
-      tiempoMinutos: 25,
-      ingredientes: [
-        '2 lomos de salmón fresco',
-        '2 patatas medianas',
-        'Eneldo fresco picado',
-        'Aceite de oliva virgen extra',
-        'Sal y pimienta',
-      ],
-      pasos: [
-        'Precalentar el horno a 200°C con calor arriba y abajo.',
-        'Cortar las patatas en rodajas finas, colocarlas en una bandeja con sal y un chorrito de aceite.',
-        'Hornear las patatas durante 15 minutos.',
-        'Colocar los lomos de salmón sobre las patatas, sazonar con sal, pimienta y eneldo fresco.',
-        'Hornear durante 10-12 minutos más hasta que el salmón esté en su punto.',
-      ],
-    },
-  ]);
+  const [recetas, setRecetas] = useState<Receta[]>([]);
 
   // ---------------------------------------------------------------------------
-  // 3. Sincronización en Tiempo Real con Firebase Firestore
+  // 3. Carga y Sincronización de Datos (Personal vs Demo)
   // ---------------------------------------------------------------------------
 
-  useEffect(() => {
-    // Escucha en tiempo real: cualquier cambio en la nube se refleja de inmediato
-    const desuscribir = onSnapshot(docHogarRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const datos = docSnap.data();
-        if (datos.registroComidas) setRegistroComidas(datos.registroComidas);
-        if (datos.tuppers) setTuppers(datos.tuppers);
-        if (datos.itemsCompra) setItemsCompra(datos.itemsCompra);
-        if (datos.recetas) setRecetas(datos.recetas);
+  // Carga o reinicio del Modo Demo
+  const cargarDatosDemo = useCallback(() => {
+    const demoGuardado = localStorage.getItem(AUTH_CONFIG.STORAGE_KEYS.DEMO_STATE);
+    if (demoGuardado) {
+      try {
+        const parsed = JSON.parse(demoGuardado);
+        setRegistroComidas(parsed.registroComidas || obtenerRegistroComidasDemo());
+        setTuppers(parsed.tuppers || DEMO_TUPPERS);
+        setItemsCompra(parsed.itemsCompra || DEMO_ITEMS_COMPRA);
+        setRecetas(parsed.recetas || DEMO_RECETAS);
+        return;
+      } catch (err) {
+        console.warn('Error al leer datos demo guardados, restableciendo iniciales.', err);
       }
-    });
-
-    return () => desuscribir();
+    }
+    setRegistroComidas(obtenerRegistroComidasDemo());
+    setTuppers(DEMO_TUPPERS);
+    setItemsCompra(DEMO_ITEMS_COMPRA);
+    setRecetas(DEMO_RECETAS);
   }, []);
 
-  // Función para eliminar campos undefined recursivamente (Firestore los rechaza y causa errores)
+  useEffect(() => {
+    if (modoAcceso === 'demo') {
+      cargarDatosDemo();
+      return;
+    }
+
+    if (modoAcceso === 'personal') {
+      // Escucha en tiempo real de Firebase Firestore para el hogar personal
+      const desuscribir = onSnapshot(docHogarRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const datos = docSnap.data();
+          if (datos.registroComidas) setRegistroComidas(datos.registroComidas);
+          if (datos.tuppers) setTuppers(datos.tuppers);
+          if (datos.itemsCompra) setItemsCompra(datos.itemsCompra);
+          if (datos.recetas) setRecetas(datos.recetas);
+        }
+      });
+
+      return () => desuscribir();
+    }
+  }, [modoAcceso, cargarDatosDemo]);
+
+  // Función para eliminar campos undefined recursivamente (Firestore los rechaza)
   const eliminarCamposUndefined = <T,>(obj: T): T => {
     if (obj === null || obj === undefined || typeof obj !== 'object') {
       return obj;
@@ -122,19 +150,66 @@ export default function App() {
     return limpio as T;
   };
 
-  // Función auxiliar para guardar cambios parciales en Firestore
-  const guardarEnFirestore = async (datosNuevos: {
+  // Función de persistencia centralizada
+  const persistirCambios = async (datosNuevos: {
     registroComidas?: Record<string, Plato>;
     tuppers?: TupperPreparado[];
     itemsCompra?: ItemCompra[];
     recetas?: Receta[];
   }) => {
-    try {
-      const datosLimpios = eliminarCamposUndefined(datosNuevos);
-      await setDoc(docHogarRef, datosLimpios, { merge: true });
-    } catch (error) {
-      console.error('Error al guardar en Firestore:', error);
+    if (modoAcceso === 'personal') {
+      try {
+        const datosLimpios = eliminarCamposUndefined(datosNuevos);
+        await setDoc(docHogarRef, datosLimpios, { merge: true });
+      } catch (error) {
+        console.error('Error al guardar en Firestore:', error);
+      }
+    } else if (modoAcceso === 'demo') {
+      // En modo demo, guardamos en localStorage de forma totalmente aislada
+      try {
+        const estadoDemoActual = {
+          registroComidas: datosNuevos.registroComidas ?? registroComidas,
+          tuppers: datosNuevos.tuppers ?? tuppers,
+          itemsCompra: datosNuevos.itemsCompra ?? itemsCompra,
+          recetas: datosNuevos.recetas ?? recetas,
+        };
+        localStorage.setItem(
+          AUTH_CONFIG.STORAGE_KEYS.DEMO_STATE,
+          JSON.stringify(estadoDemoActual)
+        );
+      } catch (err) {
+        console.error('Error al guardar estado demo local:', err);
+      }
     }
+  };
+
+  // Manejar reinicio de datos de demostración
+  const manejarReiniciarDemo = async () => {
+    const confirmado = await confirmarAccion(
+      '¿Restablecer datos de prueba?',
+      'Se volverán a cargar los platos, recetas y tuppers de ejemplo iniciales.',
+      'Sí, restablecer',
+      'Cancelar'
+    );
+    if (confirmado) {
+      localStorage.removeItem(AUTH_CONFIG.STORAGE_KEYS.DEMO_STATE);
+      setRegistroComidas(obtenerRegistroComidasDemo());
+      setTuppers(DEMO_TUPPERS);
+      setItemsCompra(DEMO_ITEMS_COMPRA);
+      setRecetas(DEMO_RECETAS);
+      mostrarToastExito('Datos de demostración restablecidos.');
+    }
+  };
+
+  // Manejar cierre de sesión
+  const manejarCerrarSesion = async () => {
+    localStorage.removeItem(AUTH_CONFIG.STORAGE_KEYS.AUTH_MODE);
+    sessionStorage.removeItem(AUTH_CONFIG.STORAGE_KEYS.AUTH_MODE);
+    setModoAcceso(null);
+    setRegistroComidas({});
+    setTuppers([]);
+    setItemsCompra([]);
+    setRecetas([]);
   };
 
   // ---------------------------------------------------------------------------
@@ -152,13 +227,13 @@ export default function App() {
     };
     const listaActualizada = [nuevoTupper, ...tuppers];
     setTuppers(listaActualizada);
-    guardarEnFirestore({ tuppers: listaActualizada });
+    persistirCambios({ tuppers: listaActualizada });
   };
 
   const manejarEliminarTupper = (id: string) => {
     const listaActualizada = tuppers.filter((t) => t.id !== id);
     setTuppers(listaActualizada);
-    guardarEnFirestore({ tuppers: listaActualizada });
+    persistirCambios({ tuppers: listaActualizada });
   };
 
   // ---------------------------------------------------------------------------
@@ -174,7 +249,7 @@ export default function App() {
     };
     const listaActualizada = [nuevoItem, ...itemsCompra];
     setItemsCompra(listaActualizada);
-    guardarEnFirestore({ itemsCompra: listaActualizada });
+    persistirCambios({ itemsCompra: listaActualizada });
   };
 
   const manejarAlternarComprado = (id: string) => {
@@ -182,19 +257,19 @@ export default function App() {
       item.id === id ? { ...item, comprado: !item.comprado } : item
     );
     setItemsCompra(listaActualizada);
-    guardarEnFirestore({ itemsCompra: listaActualizada });
+    persistirCambios({ itemsCompra: listaActualizada });
   };
 
   const manejarEliminarItemCompra = (id: string) => {
     const listaActualizada = itemsCompra.filter((item) => item.id !== id);
     setItemsCompra(listaActualizada);
-    guardarEnFirestore({ itemsCompra: listaActualizada });
+    persistirCambios({ itemsCompra: listaActualizada });
   };
 
   const manejarLimpiarComprados = () => {
     const listaActualizada = itemsCompra.filter((item) => !item.comprado);
     setItemsCompra(listaActualizada);
-    guardarEnFirestore({ itemsCompra: listaActualizada });
+    persistirCambios({ itemsCompra: listaActualizada });
   };
 
   const totalPendientesCompra = itemsCompra.filter((item) => !item.comprado).length;
@@ -211,13 +286,13 @@ export default function App() {
     };
     const listaActualizada = [recetaCompleta, ...recetas];
     setRecetas(listaActualizada);
-    guardarEnFirestore({ recetas: listaActualizada });
+    persistirCambios({ recetas: listaActualizada });
   };
 
   const manejarEliminarReceta = (id: string) => {
     const listaActualizada = recetas.filter((r) => r.id !== id);
     setRecetas(listaActualizada);
-    guardarEnFirestore({ recetas: listaActualizada });
+    persistirCambios({ recetas: listaActualizada });
   };
 
   const manejarExportarACompra = (ingredientes: string[]) => {
@@ -228,7 +303,7 @@ export default function App() {
     }));
     const listaActualizada = [...nuevosItems, ...itemsCompra];
     setItemsCompra(listaActualizada);
-    guardarEnFirestore({ itemsCompra: listaActualizada });
+    persistirCambios({ itemsCompra: listaActualizada });
     mostrarToastExito(`¡Se han añadido ${ingredientes.length} ingredientes a tu lista de compra!`);
   };
 
@@ -285,7 +360,7 @@ export default function App() {
 
     setRegistroComidas(nuevoRegistro);
     setTuppers(nuevosTuppers);
-    guardarEnFirestore({ registroComidas: nuevoRegistro, tuppers: nuevosTuppers });
+    persistirCambios({ registroComidas: nuevoRegistro, tuppers: nuevosTuppers });
     manejarCerrarModal();
   };
 
@@ -305,11 +380,23 @@ export default function App() {
 
     setRegistroComidas(nuevoRegistro);
     setTuppers(nuevosTuppers);
-    guardarEnFirestore({ registroComidas: nuevoRegistro, tuppers: nuevosTuppers });
+    persistirCambios({ registroComidas: nuevoRegistro, tuppers: nuevosTuppers });
   };
 
   // ---------------------------------------------------------------------------
-  // 8. Cálculos y Render
+  // 8. Renderizado Condicional: Pantalla de Login / Entrada
+  // ---------------------------------------------------------------------------
+  if (!modoAcceso) {
+    return (
+      <LoginScreen
+        alAccederPersonal={() => setModoAcceso('personal')}
+        alAccederDemo={() => setModoAcceso('demo')}
+      />
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // 9. Cálculos y Render de la App Principal
   // ---------------------------------------------------------------------------
   const diasSemana = obtenerDiasDeLaSemana(fechaLunesActual);
   const textoRangoSemana = formatearRangoSemana(fechaLunesActual);
@@ -318,17 +405,48 @@ export default function App() {
     <div className="min-h-screen bg-slate-100/60 text-slate-800 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         
+        {/* Banner informativo en Modo Demo */}
+        {modoAcceso === 'demo' && (
+          <aside aria-label="Aviso de Modo Demo" className="mb-4 p-3.5 bg-gradient-to-r from-amber-50 via-orange-50/70 to-amber-50 border border-amber-200/90 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-amber-950 shadow-xs animate-in fade-in">
+            <div>
+              <p>
+                <strong>Modo Demo:</strong> Estás probando la aplicación en un entorno seguro. Puedes planificar platos, añadir recetas o tuppers sin afectar a la base de datos real.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={manejarReiniciarDemo}
+                className="px-3 py-1.5 bg-white hover:bg-amber-100/80 text-amber-900 font-bold rounded-lg border border-amber-300 transition-colors text-xs cursor-pointer shadow-2xs"
+                title="Restablecer platos y recetas de prueba"
+              >
+                🔄 Reiniciar Demo
+              </button>
+              <button
+                type="button"
+                onClick={manejarCerrarSesion}
+                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-lg shadow-2xs transition-colors text-xs cursor-pointer"
+                title="Salir del Modo Demo"
+              >
+                Salir
+              </button>
+            </div>
+          </aside>
+        )}
+
         {/* Cabecera semanal */}
         <CabeceraSemanal
           tituloRango={textoRangoSemana}
           totalPendientesCompra={totalPendientesCompra}
           totalTuppersCongelador={tuppers.reduce((acc, t) => acc + (t.racionesDisponibles || 0), 0)}
+          modoAcceso={modoAcceso}
           alSemanaAnterior={manejarRetrocederSemana}
           alSemanaSiguiente={manejarAvanzarSemana}
           alVolverHoy={manejarVolverAHoy}
           alAbrirListaCompra={() => setModalCompraAbierto(true)}
           alAbrirRecetas={() => setModalRecetasAbierto(true)}
           alAbrirCongelador={() => setModalCongeladorAbierto(true)}
+          alCerrarSesion={manejarCerrarSesion}
         />
 
         {/* Cuadrícula semanal (7 columnas) */}
@@ -349,8 +467,6 @@ export default function App() {
             );
           })}
         </main>
-
-
 
         {/* Modal de asignación de plato */}
         {seleccionActual && (

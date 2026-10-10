@@ -1,16 +1,16 @@
 {
-  "name": "Planificador de Menús",
-  "short_name": "Menú Casa",
+  "name": "Menu Planner",
+  "short_name": "Menu Planner",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#059669",
   "icons": [
     {
-      "src": "/favicon.svg",
+      "src": "/icono-menuplanner.jpg",
       "sizes": "192x192 512x512",
-      "type": "image/svg+xml",
+      "type": "image/jpeg",
       "purpose": "any maskable"
     }
   ]
-}
+}

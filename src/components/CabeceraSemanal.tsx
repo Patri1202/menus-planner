@@ -14,6 +14,9 @@ export interface CabeceraSemanalProps {
   // Cantidad de tuppers o raciones disponibles en el congelador
   totalTuppersCongelador?: number;
 
+  // Modo de acceso actual ('personal' o 'demo')
+  modoAcceso?: 'personal' | 'demo';
+
   // Función para retroceder 7 días en el calendario
   alSemanaAnterior: () => void;
 
@@ -31,6 +34,9 @@ export interface CabeceraSemanalProps {
 
   // Función para abrir la ventana modal del congelador
   alAbrirCongelador: () => void;
+
+  // Función para cerrar la sesión actual
+  alCerrarSesion?: () => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -41,12 +47,14 @@ export const CabeceraSemanal = ({
   tituloRango,
   totalPendientesCompra = 0,
   totalTuppersCongelador = 0,
+  modoAcceso = 'personal',
   alSemanaAnterior,
   alSemanaSiguiente,
   alVolverHoy,
   alAbrirListaCompra,
   alAbrirRecetas,
   alAbrirCongelador,
+  alCerrarSesion,
 }: CabeceraSemanalProps) => {
   return (
     // CONTENEDOR PRINCIPAL:
@@ -55,8 +63,13 @@ export const CabeceraSemanal = ({
     // - shadow-xs: sombra mínima que no sobrecarga la vista
     <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-4 sm:p-5 rounded-lg border border-slate-200 shadow-xs mb-6">
       <div className="flex flex-col gap-2">
-        <h1 className="text-xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
-          <span>🥗</span> Menú Semanal
+        <h1 className="text-xl font-bold text-slate-800 tracking-tight flex items-center gap-2.5">
+          <img
+            src="/icono-menuplanner.jpg"
+            alt="Menu Planner Logo"
+            className="w-7 h-7 rounded-md object-cover shadow-2xs border border-slate-200"
+          />
+          <span>Menú Semanal</span>
         </h1>
 
         {/* Línea de navegación temporal: botones para avanzar o retroceder de semana */}
@@ -104,7 +117,7 @@ export const CabeceraSemanal = ({
           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors cursor-pointer"
           title="Ver recetario"
         >
-          <span>📖 Recetas</span>
+          <span>Recetas</span>
         </button>
 
         {/* BOTÓN: Abrir modal de la lista de la compra */}
@@ -114,7 +127,7 @@ export const CabeceraSemanal = ({
           className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors cursor-pointer"
           title="Ver lista de la compra"
         >
-          <span>🛒 Compra</span>
+          <span>Compra</span>
           {totalPendientesCompra > 0 && (
             <span className="bg-emerald-600 text-white text-[10px] px-1.5 py-0.2 rounded font-black">
               {totalPendientesCompra}
@@ -129,13 +142,35 @@ export const CabeceraSemanal = ({
           className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors cursor-pointer"
           title="Ver congelador y tuppers"
         >
-          <span>🧊 Congelador</span>
+          <span>Congelador</span>
           {totalTuppersCongelador > 0 && (
             <span className="bg-sky-600 text-white text-[10px] px-1.5 py-0.2 rounded font-black">
               {totalTuppersCongelador}
             </span>
           )}
         </button>
+
+        {/* Separador y Acceso/Cierre de sesión */}
+        {alCerrarSesion && (
+          <>
+            <div className="h-6 w-px bg-slate-200 hidden sm:block"></div>
+            <div className="flex items-center gap-1.5">
+              {modoAcceso === 'personal' && (
+                <span className="hidden md:inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200/60">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Mi Hogar
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={alCerrarSesion}
+                className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors cursor-pointer border border-transparent hover:border-red-200"
+                title={modoAcceso === 'personal' ? 'Cerrar sesión' : 'Salir del Modo Demo'}
+              >
+                <span>Salir</span>
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </header>
   );
